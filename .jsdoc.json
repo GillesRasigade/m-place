@@ -1,0 +1,24 @@
+{
+  "opts": {
+    "destination": "./doc/",
+    "encoding": "utf8",
+    "private": true,
+    "recurse": true
+  },
+  "tags": {
+    "allowUnknownTags": true,
+    "dictionaries": ["jsdoc", "closure"]
+  },
+  "source": {
+    "includePattern": ".+\\.js(doc)?$",
+    "excludePattern": "(^|\\/|\\\\)_"
+  },
+  "plugins": ["plugins/markdown"],
+  "templates": {
+    "cleverLinks": false,
+    "monospaceLinks": true
+  },
+  "markdown": {
+    "parser": "gfm"
+  }
+}
