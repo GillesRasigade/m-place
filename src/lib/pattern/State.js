@@ -1,11 +1,17 @@
 
 export default class State {
-  constructor(subject, state, states, data) {
+  constructor(subject, state, states, data, restore) {
     this.subject = subject;
     this.id = state;
     this.states = states;
     this.previousState = this.subject.state;
-    this.data = data || (this.previousState && this.previousState.data) || {};
+    this.data = Object.assign({},
+      (data || (this.previousState && this.previousState.data) || {}),
+      {
+        state,
+        updated: restore ? new Date(data.updated) : new Date()
+      }
+    );
   }
 
   bind() {

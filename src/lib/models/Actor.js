@@ -1,5 +1,5 @@
 export default class Actor {
-  constructor(name) {
+  constructor({ name }) {
     this.name = name;
   }
 }

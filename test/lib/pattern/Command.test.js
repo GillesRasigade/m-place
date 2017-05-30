@@ -3,7 +3,7 @@ import { expect } from 'chai';
 
 import Command from '../../../src/lib/pattern/Command';
 
-describe.only('Command', () => {
+describe('Command', () => {
   class A {
     constructor(amount = 0) {
       this.amount = amount;

@@ -46,17 +46,29 @@ export default (A = T, STATES, defaultState, defaultData) => class extends A {
     }
   }
 
+  updateData(data) {
+    return this.setData(Object.assign({}, this.data, data));
+  }
+
   setData(data) {
     return this.setState(this.state.id, data);
   }
 
-  setState(state, data) {
+  toJSON() {
+    return JSON.parse(JSON.stringify(this.data));
+  }
+
+  restoreState(data) {
+    return this.setState(data.state, data, true);
+  }
+
+  setState(state, data, restore = false) {
     this.unbind();
 
     if (state instanceof State) {
       this._state = state;
     } else {
-      this._state = new State(this, state, STATES, data);
+      this._state = new State(this, state, STATES, data, restore);
     }
 
     this._state.bind();

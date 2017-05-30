@@ -1,4 +1,5 @@
 test/
 --compilers js:babel-core/register
 --require babel-polyfill
+--timeout 30000
 --recursive
