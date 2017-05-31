@@ -56,8 +56,8 @@ describe('Contract', () => {
     it('initializes the object correctly', async () => {
       const c1 = new Contract();
       c1
-        .do('addTerm', { name: 'Term #1', description: 'Description first terms' })
-        .do('addTerm', { name: 'Term #2' });
+        .do('addTerm', [{ name: 'Term #1', description: 'Description first terms' }])
+        .do('addTerm', [{ name: 'Term #2' }]);
 
       await new Promise(resolve => setTimeout(resolve, 100));
 

@@ -8,8 +8,8 @@ export default (A = T, DUAL = {}) => class extends A {
     this.commands = new Commands(this);
   }
 
-  do(method, ...args) {
-    return this.commands.execute(method, args, DUAL[method], args);
+  do(execute, executeArguments, undoArguments = executeArguments, undo = DUAL[execute]) {
+    return this.commands.execute(execute, executeArguments, undo, undoArguments);
   }
 
   undo() {

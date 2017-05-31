@@ -2,7 +2,7 @@ import { expect } from 'chai';
 
 import { Actor, Contract, Transaction } from '../../src/lib/models';
 
-describe.only('Functional', () => {
+describe('Functional', () => {
   const joe = new Actor({ name: 'Joe' });
   const william = new Actor({ name: 'William' });
   const jack = new Actor({ name: 'Jack' });
@@ -16,7 +16,7 @@ describe.only('Functional', () => {
      * Contract definition
      */
     contract
-      .do('changeOwnership', joe)
+      .do('changeOwnership', [joe])
       .addTerm({ name: 'Term #1' })
       .addTerm({ name: 'Term #2' })
       .addTerm({
@@ -150,7 +150,7 @@ describe.only('Functional', () => {
     const transaction = new Transaction({ contract });
 
     try {
-      transaction.do('order', [averell, luke]);
+      transaction.do('order', [[averell, luke]]);
     } catch (err) {
       console.error(err);
     }

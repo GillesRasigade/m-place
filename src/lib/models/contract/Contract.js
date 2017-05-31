@@ -129,7 +129,7 @@ export default class Contract
     if (data) {
       const d = Object.assign(INITIAL_DATA, data);
       d.terms = d.terms.map(term => new Term(term));
-      d.actors = d.actors.map(actor => new Actor(actor));
+      d.parties = d.parties.map(party => new Actor(party));
 
       this.restoreState(d);
     }
