@@ -1,6 +1,6 @@
 import c from './contract';
 import a from './Actor';
-import p from './Price';
+import p from './price';
 import t from './transaction';
 
 export const Actor = a;

@@ -1,11 +1,15 @@
 import T from './Termination';
 import State from './State';
 
-export default (A = T, STATES, defaultState, defaultData) => class extends A {
-  constructor({ state, data } = { state: defaultState, data: defaultData }) {
+export default (A = T, STATES, defaultState = Object.keys(STATES).shift(), defaultData = {}) => class extends A {
+  /**
+   *
+   * @param {object} data
+   */
+  constructor(data = {}) {
     super();
 
-    this.setState(state, data);
+    this.setState(data.state || defaultState, Object.assign({ }, defaultData, data));
   }
 
   /**
@@ -14,7 +18,7 @@ export default (A = T, STATES, defaultState, defaultData) => class extends A {
    * @returns {State}
    */
   cancelLastAction() {
-    return this.state ? this.setState(this.state.previousState) : this;
+    return this.setState(this.state.previousState);
   }
 
   /**
@@ -23,10 +27,8 @@ export default (A = T, STATES, defaultState, defaultData) => class extends A {
    * @returns {State}
    */
   cancelAllActions() {
-    if (this.state) {
-      while (this.state.previousState) {
-        this.cancelLastAction();
-      }
+    while (this.state.previousState) {
+      this.cancelLastAction();
     }
   }
 
@@ -58,17 +60,13 @@ export default (A = T, STATES, defaultState, defaultData) => class extends A {
     return JSON.parse(JSON.stringify(this.data));
   }
 
-  restoreState(data) {
-    return this.setState(data.state, data, true);
-  }
-
-  setState(state, data, restore = false) {
+  setState(state, data) {
     this.unbind();
 
     if (state instanceof State) {
       this._state = state;
     } else {
-      this._state = new State(this, state, STATES, data, restore);
+      this._state = new State(this, state, STATES, data);
     }
 
     this._state.bind();

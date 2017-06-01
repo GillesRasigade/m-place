@@ -1,16 +1,14 @@
 
 export default class State {
-  constructor(subject, state, states, data, restore) {
+  constructor(subject, state, states, data) {
     this.subject = subject;
     this.id = state;
     this.states = states;
     this.previousState = this.subject.state;
+
+    const d = (data || (this.previousState && this.previousState.data) || {});
     this.data = Object.assign({},
-      (data || (this.previousState && this.previousState.data) || {}),
-      {
-        state,
-        updated: restore ? new Date(data.updated) : new Date()
-      }
+      d, { state, updated: d.updated ? new Date(d.updated) : new Date() }
     );
   }
 
@@ -21,11 +19,5 @@ export default class State {
     }
 
     return this;
-  }
-
-  cancel() {
-    if (this.subject.state === this) {
-      return this.subject.setState(this.previousState);
-    }
   }
 }

@@ -1,17 +1,19 @@
 import { expect } from 'chai';
 
+import T from '../../../src/lib/pattern/Termination';
 import Undoable from '../../../src/lib/pattern/Undoable';
 
 describe('Undoable', () => {
-  class A extends Undoable(A, {
+  class A extends Undoable(T, {
     setAmount: 'setAmount',
     set: 'unset',
     unset: 'set'
   }) {
-    constructor(amount = 0) {
+    constructor(amount = 0, key = false) {
       super();
 
       this.amount = amount;
+      this.key = key;
     }
 
     setAmount(amount = 2) { this.amount = amount; }

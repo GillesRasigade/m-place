@@ -71,15 +71,15 @@ export default class Transaction
   constructor(data) {
     super();
 
-    this.setData(data);
+    this.init(data);
   }
 
   init(data) {
     if (data) {
       const d = Object.assign(INITIAL_DATA, data);
-      d.contract = new Contract(data.contract);
+      d.contract = data.contract instanceof Contract ? data.contract : new Contract(data.contract);
 
-      this.restoreState(d);
+      this.updateData(d);
     }
   }
 

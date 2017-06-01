@@ -25,8 +25,10 @@ const ACTIONS = {
     return this.updateData({ terms });
   },
 
-  changeOwnership(owner) {
-    return this.updateData({ owner });
+  changeOwnership(actor) {
+    return this.updateData({
+      owner: actor instanceof Actor ? actor : new Actor(actor)
+    });
   },
 
   addParty(actor) {
@@ -52,13 +54,7 @@ const ACTIONS = {
   },
 
   sign() {
-    try {
-      return this.checkForSigning().setState('signed');
-    } catch (err) {
-      this.err = err;
-    }
-
-    return this;
+    return this.checkForSigning().setState('signed');
   },
 
   cancel() {
@@ -131,12 +127,8 @@ export default class Contract
       d.terms = d.terms.map(term => new Term(term));
       d.parties = d.parties.map(party => new Actor(party));
 
-      this.restoreState(d);
+      this.updateData(d);
     }
-  }
-
-  get terms() {
-    return this.data.terms;
   }
 
   validateTransaction(transaction) {
@@ -145,8 +137,12 @@ export default class Contract
 
   checkForSigning() {
     const data = this.data;
+    if (!(data.owner instanceof Actor)) {
+      throw new Error('A owner to this contract must be defined');
+    }
+
     if (data.terms.length === 0) {
-      throw new Error('Please define at least one term to this contract');
+      throw new Error('At least one Term must be defined to sign a contract');
     }
 
     return this;
@@ -154,5 +150,12 @@ export default class Contract
 
   toString() {
     return this.data.terms.map(term => term.toString()).join('');
+  }
+
+  /**
+   * GETTERS
+   */
+  get terms() {
+    return this.data.terms;
   }
 }

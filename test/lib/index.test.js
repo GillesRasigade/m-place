@@ -141,9 +141,6 @@ describe('Functional', () => {
       .sign()
       .publish();
 
-
-    // console.log(contract.toJSON());
-
     /**
      * Transaction creation from a given contract
      */

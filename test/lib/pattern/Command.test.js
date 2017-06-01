@@ -68,6 +68,14 @@ describe('Command', () => {
       command.execute();
       expect(A.prototype.echoCalled).to.equal(true);
     });
+
+    it('supports to call static methods', () => {
+      const a = new A();
+      const command = new Command(a, 'echo');
+
+      command.execute();
+      expect(A.prototype.echoCalled).to.equal(true);
+    });
   });
 
   describe('not undoable', () => {
