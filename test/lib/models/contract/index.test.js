@@ -5,132 +5,189 @@ import Actor from '../../../../src/lib/models/Actor';
 import Contract from '../../../../src/lib/models/contract';
 
 describe('Contract', () => {
-  describe('#addTerm', () => {
-    it('allows to add term to a contract', () => {
-      const contract = new Contract();
-      expect(contract.data.terms).to.have.property('length', 0);
+  describe('actions', () => {
+    describe('#addTerm', () => {
+      it('allows to add term to a contract', () => {
+        const contract = new Contract();
+        expect(contract.data.terms).to.have.property('length', 0);
 
-      contract.addTerm({
-        name: 'Transaction seller must be called B'
+        contract.addTerm({
+          name: 'Transaction seller must be called B'
+        });
+        expect(contract.data.terms).to.have.property('length', 1);
       });
-      expect(contract.data.terms).to.have.property('length', 1);
-    });
-  });
-
-  describe('#removeTerm', () => {
-    it('allows to remove a term from a contract', () => {
-      const contract = new Contract();
-      expect(contract.data.terms).to.have.property('length', 0);
-
-      contract
-        .addTerm({ name: 'Term #1' })
-        .addTerm({ name: 'Term #2' })
-        .removeTerm(0);
-
-      expect(contract.data.terms).to.have.property('length', 1);
-      expect(contract.data.terms[0]).to.have.property('name', 'Term #2');
-    });
-  });
-
-  describe('#addParty', () => {
-    it('allows to add a party to a contract', () => {
-      const john = new Actor({ name: 'John' });
-      const contract = new Contract();
-      expect(contract.data.parties).to.have.property('length', 0);
-
-      contract.addParty(john);
-      expect(contract.data.parties).to.have.property('length', 1);
-    });
-  });
-
-  describe('#removeParty', () => {
-    it('allows to remove a term from a contract', () => {
-      const john = new Actor({ name: 'John' });
-      const contract = new Contract();
-      expect(contract.data.parties).to.have.property('length', 0);
-
-      contract
-        .addParty(john)
-        .addParty({ name: 'Keeping' })
-        .removeParty(0);
-
-      expect(contract.data.parties).to.have.property('length', 1);
-      expect(contract.data.parties[0]).to.have.property('name', 'Keeping');
-    });
-  });
-
-  describe('#changeOwnership', () => {
-    it('allows to change the ownership of a contract', () => {
-      const john = new Actor({ name: 'John' });
-      const contract = new Contract();
-      expect(contract.data).to.have.property('owner', null);
-
-      contract.changeOwnership(john);
-
-      expect(contract.data).to.have.property('owner', john);
-    });
-  });
-
-  describe('#sign', () => {
-    it('allows to be signed when in edition mode', () => {
-      const contract = new Contract();
-
-      contract
-        .changeOwnership({ name: 'Owner' })
-        .addTerm({ name: 'Term #1' })
-        .addTerm({ name: 'Term #2' })
-        .sign();
-
-      expect(contract.state.id).to.equal('signed');
     });
 
-    describe('preconditions failed', () => {
-      it('throws an exception if no Owner is defined', () => {
+    describe('#removeTerm', () => {
+      it('allows to remove a term from a contract', () => {
+        const contract = new Contract();
+        expect(contract.data.terms).to.have.property('length', 0);
+
+        contract
+          .addTerm({ name: 'Term #1' })
+          .addTerm({ name: 'Term #2' })
+          .removeTerm(0);
+
+        expect(contract.data.terms).to.have.property('length', 1);
+        expect(contract.data.terms[0]).to.have.property('name', 'Term #2');
+      });
+    });
+
+    describe('#addParty', () => {
+      it('allows to add a party to a contract', () => {
+        const john = new Actor({ name: 'John' });
+        const contract = new Contract();
+        expect(contract.data.parties).to.have.property('length', 0);
+
+        contract.addParty(john);
+        expect(contract.data.parties).to.have.property('length', 1);
+      });
+    });
+
+    describe('#removeParty', () => {
+      it('allows to remove a term from a contract', () => {
+        const john = new Actor({ name: 'John' });
+        const contract = new Contract();
+        expect(contract.data.parties).to.have.property('length', 0);
+
+        contract
+          .addParty(john)
+          .addParty({ name: 'Keeping' })
+          .removeParty(0);
+
+        expect(contract.data.parties).to.have.property('length', 1);
+        expect(contract.data.parties[0]).to.have.property('name', 'Keeping');
+      });
+    });
+
+    describe('#changeOwnership', () => {
+      it('allows to change the ownership of a contract', () => {
+        const john = new Actor({ name: 'John' });
+        const contract = new Contract();
+        expect(contract.data).to.have.property('owner', null);
+
+        contract.changeOwnership(john);
+
+        expect(contract.data).to.have.property('owner', john);
+      });
+    });
+
+    describe('#sign', () => {
+      it('allows to be signed when in edition mode', () => {
         const contract = new Contract();
 
-        expect(contract.sign.bind(contract))
-          .to.throws(Error, 'A owner to this contract must be defined');
+        contract
+          .changeOwnership({ name: 'Owner' })
+          .addTerm({ name: 'Term #1' })
+          .addTerm({ name: 'Term #2' })
+          .sign();
+
+        expect(contract.state.id).to.equal('signed');
       });
 
-      it('throws an exception if no Terms  are defined', () => {
+      describe('preconditions failed', () => {
+        it('throws an exception if no Owner is defined', () => {
+          const contract = new Contract();
+
+          expect(contract.sign.bind(contract))
+            .to.throws(Error, 'A owner to this contract must be defined');
+        });
+
+        it('throws an exception if no Terms  are defined', () => {
+          const contract = new Contract();
+
+          contract.changeOwnership({ name: 'Owner' });
+
+          expect(contract.sign.bind(contract))
+            .to.throws(Error, 'At least one Term must be defined to sign a contract');
+        });
+      });
+    });
+
+    describe('#publish', () => {
+      it('allows to publish a contract', () => {
         const contract = new Contract();
+        expect(contract.data).to.have.property('state', 'edition');
 
-        contract.changeOwnership({ name: 'Owner' });
+        contract
+          .changeOwnership({ name: 'Owner' })
+          .addTerm({ name: 'Term #1' })
+          .sign()
+          .publish();
 
-        expect(contract.sign.bind(contract))
-          .to.throws(Error, 'At least one Term must be defined to sign a contract');
+        expect(contract.data).to.have.property('state', 'published');
       });
     });
-  });
 
-  describe('#publish', () => {
-    it('allows to publish a contract', () => {
-      const contract = new Contract();
-      expect(contract.data).to.have.property('state', 'edition');
+    describe('#unpublish', () => {
+      it('allows to unpublish a contract when published', () => {
+        const contract = new Contract();
+        expect(contract.data).to.have.property('state', 'edition');
 
-      contract
-        .changeOwnership({ name: 'Owner' })
-        .addTerm({ name: 'Term #1' })
-        .sign()
-        .publish();
+        contract
+          .changeOwnership({ name: 'Owner' })
+          .addTerm({ name: 'Term #1' })
+          .sign()
+          .publish()
+          .unpublish();
 
-      expect(contract.data).to.have.property('state', 'published');
+        expect(contract.data).to.have.property('state', 'signed');
+      });
     });
-  });
 
-  describe('#unpublish', () => {
-    it('allows to unpublish a contract when published', () => {
-      const contract = new Contract();
-      expect(contract.data).to.have.property('state', 'edition');
+    describe('#cancel', () => {
+      it('allows to cancel a contract in published state', () => {
+        const contract = new Contract();
+        expect(contract.data).to.have.property('state', 'edition');
 
-      contract
-        .changeOwnership({ name: 'Owner' })
-        .addTerm({ name: 'Term #1' })
-        .sign()
-        .publish()
-        .unpublish();
+        contract
+          .changeOwnership({ name: 'Owner' })
+          .addTerm({ name: 'Term #1' })
+          .sign()
+          .publish()
+          .cancel();
 
-      expect(contract.data).to.have.property('state', 'signed');
+        expect(contract.data).to.have.property('state', 'canceled');
+      });
+
+      it('allows to cancel a contract in signed state', () => {
+        const contract = new Contract();
+        expect(contract.data).to.have.property('state', 'edition');
+
+        contract
+          .changeOwnership({ name: 'Owner' })
+          .addTerm({ name: 'Term #1' })
+          .sign()
+          .cancel();
+
+        expect(contract.data).to.have.property('state', 'canceled');
+      });
+
+      it('allows to cancel a contract in edition state', () => {
+        const contract = new Contract();
+        expect(contract.data).to.have.property('state', 'edition');
+
+        contract
+          .cancel();
+
+        expect(contract.data).to.have.property('state', 'canceled');
+      });
+    });
+
+    describe('#edit', () => {
+      it('allows to edit a canceled contract', () => {
+        const contract = new Contract();
+        expect(contract.data).to.have.property('state', 'edition');
+
+        contract
+          .changeOwnership({ name: 'Owner' })
+          .addTerm({ name: 'Term #1' })
+          .sign()
+          .cancel()
+          .edit();
+
+        expect(contract.data).to.have.property('state', 'edition');
+      });
     });
   });
 
@@ -148,7 +205,8 @@ describe('Contract', () => {
       const c1 = new Contract();
       c1
         .do('addTerm', [{ name: 'Term #1', description: 'Description first terms' }])
-        .do('addTerm', [{ name: 'Term #2' }]);
+        .do('addTerm', [{ name: 'Term #2' }])
+        .do('addParty', [{ name: 'John'}]);
 
       await new Promise(resolve => setTimeout(resolve, 100));
 
