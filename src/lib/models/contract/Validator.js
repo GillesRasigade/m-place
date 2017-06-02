@@ -13,17 +13,15 @@ export default class Validator {
           terms[i].validate.call(this.contract, transaction);
         } catch (err) {
           errors.push({
-            id: i,
-            term: terms[i].name,
+            term_id: parseInt(i, 10),
+            term: terms[i],
             err
           });
         }
       }
     }
 
-    if (errors.length) {
-      this.errors.push(errors);
-    }
+    this.errors = errors;
     return errors;
   }
 }

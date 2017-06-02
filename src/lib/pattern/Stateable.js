@@ -1,3 +1,5 @@
+import assert from 'assert';
+
 import T from './Termination';
 import State from './State';
 
@@ -66,6 +68,7 @@ export default (A = T, STATES, defaultState = Object.keys(STATES).shift(), defau
     if (state instanceof State) {
       this._state = state;
     } else {
+      assert(STATES[state], 'Invalid state definition');
       this._state = new State(this, state, STATES, data);
     }
 

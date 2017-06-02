@@ -3,15 +3,17 @@ import Cell from './Cell';
 import Row from './Row';
 
 export default class Price {
-  constructor(transaction, { prices } = { prices: []}) {
+  constructor(transaction) {
     this.transaction = transaction;
-    this.prices = prices;
+    this.rows = [];
+    this.consolidate();
   }
 
   toString() {
+    const str = [];
     const table = [];
     const actors = [];
-    for (const r of this.prices) {
+    for (const r of this.rows) {
       for (const cell of r.cells) {
         let index = actors.indexOf(cell.actor.name);
         if (index === -1) {
@@ -22,21 +24,21 @@ export default class Price {
       }
     }
 
-    console.log('\n\n', [...actors].join('\t')); // eslint-disable-line
-    for (let i = 0; i < this.prices.length; i++) {
+    str.push([...actors].join('\t'));
+    for (let i = 0; i < this.rows.length; i++) {
       table[i] = [...actors.map(() => '')];
-      for (const cell of this.prices[i].cells) {
+      for (const cell of this.rows[i].cells) {
         const index = actors.indexOf(cell.actor.name);
         table[i][index] = `${cell.amount.toFixed(2)}`;
       }
-      // table[i].unshift(this.prices[i].term.name);
-      // console.log(this.prices[i].term.name);
 
-      console.log( // eslint-disable-line
-        '------------------\n',
-        table[i].join('\t'),
-        '\t\t\t', this.prices[i].term.name);
+      str.push(
+        '------------------',
+        [table[i].join('\t'),
+        '\t\t\t', this.rows[i].term.name].join(''));
     }
+
+    return str.join('\n');
   }
 
   amount(value) {
@@ -53,7 +55,7 @@ export default class Price {
 
   getTotalsOnTag(tag) {
     const totals = {};
-    for (const row of this.prices) {
+    for (const row of this.rows) {
       if (!row.hasTag(tag)) {
         continue;
       }
@@ -72,7 +74,7 @@ export default class Price {
 
   consolidate() {
     this.totals = {};
-    for (const row of this.prices) {
+    for (const row of this.rows) {
       let total = this.amount(0);
       for (const cell of row.cells) {
         total = total.add(cell.amount);
@@ -88,12 +90,12 @@ export default class Price {
         throw new Error('Invalid price row definition. Row sum must be zero !');
       }
     }
-    return this.prices;
+    return this.rows;
   }
 
   compute() {
     const terms = this.transaction.contract.terms;
-    this.prices = [];
+    this.rows = [];
     for (const term of terms) {
       if (typeof(term.price) === 'function') {
         let rows = term.price.call(this, this.transaction);
@@ -106,8 +108,8 @@ export default class Price {
           return row;
         });
 
-        this.prices = [...this.prices, ...rows];
-        this.prices = this.consolidate();
+        this.rows = [...this.rows, ...rows];
+        this.rows = this.consolidate();
       }
     }
 

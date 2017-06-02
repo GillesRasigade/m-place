@@ -10,40 +10,35 @@ import Price from '../price';
 /**
  * State actions and states
  */
-export const ACTIONS = {
+export const ACTIONS = Object.freeze({
   order(orderers) {
     return this.setState('ordered', Object.assign({}, this.data, {
       ordered: new Date(),
       orderers
-    })).checkAndRollback();
+    })).validateAndRollback();
   },
   complete() {
     return this.updateData({
       completed: new Date()
-    });
-  },
-  validate() {
-    return this.checkForValidate().setState('validated');
+    }).checkForComplete().setState('completed');
   },
   cancel() {
     return this.setState('canceled');
   }
-};
+});
 
-export const STATES = {
+export const STATES = Object.freeze({
   created: {
-    order: ACTIONS.order
+    order: ACTIONS.order,
+    cancel: ACTIONS.cancel
   },
   ordered: {
     complete: ACTIONS.complete,
-    validate: ACTIONS.validate,
     cancel: ACTIONS.cancel
   },
-  validated: {
-    cancel: ACTIONS.cancel
-  },
+  completed: {},
   canceled: {}
-};
+});
 
 const STATE_DUAL = Object.keys(ACTIONS).reduce((map, action) => {
     map[action] = 'cancelLastAction';
@@ -53,18 +48,18 @@ const STATE_DUAL = Object.keys(ACTIONS).reduce((map, action) => {
 /**
  * Undoable actions
  */
-export const DUAL = Object.assign({
+export const DUAL = Object.freeze(Object.assign({
   // ...
-}, STATE_DUAL);
+}, STATE_DUAL));
 
 /**
  * Initial state and data
  */
 export const INITIAL_STATE = 'created';
-export const INITIAL_DATA = {
+export const INITIAL_DATA = Object.freeze({
   contract: null,
   orderers: []
-};
+});
 
 export default class Transaction
   extends Undoable(Stateable(EventEmitter, STATES, INITIAL_STATE, INITIAL_DATA), DUAL) {
@@ -76,27 +71,22 @@ export default class Transaction
 
   init(data) {
     if (data) {
-      const d = Object.assign(INITIAL_DATA, data);
+      const d = Object.assign({}, INITIAL_DATA, data);
+
       d.contract = data.contract instanceof Contract ? data.contract : new Contract(data.contract);
+      // Following line is the correct one:
+      // d.contract = new Contract(data.contract instanceof Contract ? data.contract.toJSON() : data.contract);
 
       this.updateData(d);
     }
   }
 
-  get contract() {
-    return this.data.contract;
-  }
-
-  get owner() {
-    return this.data.owner;
-  }
-
-  check() {
+  validate() {
     return this.data.contract.validateTransaction(this);
   }
 
-  checkAndRollback() {
-    const errors = this.check();
+  validateAndRollback() {
+    const errors = this.validate();
     if (errors.length) {
       this.cancelLastAction();
       const err = new Error('Transaction check failed');
@@ -113,19 +103,17 @@ export default class Transaction
     return price.compute();
   }
 
-  checkForOrder(orderers) {
+  checkForComplete() {
     const data = this.data;
-    for (const actor of orderers) {
-      assert(data.contract.data.parties.indexOf(actor) === -1, 'A party can not order his transaction');
-    }
+    assert(data.completed instanceof Date, 'Transaction must have a valid completed date');
 
     return this;
   }
 
-  checkForValidate() {
-    const data = this.data;
-    assert(data.contract instanceof Contract, 'Transaction must have a valid Contract');
-
-    return this;
+  /**
+   * GETTERS
+   */
+  get contract() {
+    return this.data.contract;
   }
 }

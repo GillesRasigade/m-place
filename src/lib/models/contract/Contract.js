@@ -10,7 +10,7 @@ import Actor from '../Actor';
 /**
  * State actions and states
  */
-const ACTIONS = {
+const ACTIONS = Object.freeze({
   addTerm(term) {
     return this.updateData({
       terms: [].concat(this.data.terms, [
@@ -64,9 +64,9 @@ const ACTIONS = {
   edit() {
     return this.setState('edition');
   }
-};
+});
 
-const STATES = {
+const STATES = Object.freeze({
   edition: {
     changeOwnership: ACTIONS.changeOwnership,
     addTerm: ACTIONS.addTerm,
@@ -87,7 +87,7 @@ const STATES = {
   canceled: {
     edit: ACTIONS.edit
   }
-};
+});
 
 const STATE_DUAL = Object.keys(ACTIONS).reduce((map, action) => {
     map[action] = 'cancelLastAction';
@@ -97,19 +97,19 @@ const STATE_DUAL = Object.keys(ACTIONS).reduce((map, action) => {
 /**
  * Undoable actions
  */
-const DUAL = Object.assign({
+const DUAL = Object.freeze(Object.assign({
   // ...
-}, STATE_DUAL);
+}, STATE_DUAL));
 
 /**
  * Initial state and data
  */
 const INITIAL_STATE = 'edition';
-const INITIAL_DATA = {
+const INITIAL_DATA = Object.freeze({
   terms: [],
   owner: null,
   parties: []
-};
+});
 
 export default class Contract
   extends Undoable(Stateable(EventEmitter, STATES, INITIAL_STATE, INITIAL_DATA), DUAL) {
@@ -123,7 +123,7 @@ export default class Contract
 
   init(data) {
     if (data) {
-      const d = Object.assign(INITIAL_DATA, data);
+      const d = Object.assign({}, INITIAL_DATA, data);
       d.terms = d.terms.map(term => new Term(term));
       d.parties = d.parties.map(party => new Actor(party));
 
