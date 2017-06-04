@@ -2,7 +2,7 @@ import { expect } from 'chai';
 
 import Actor from '../../../../src/lib/models/Actor';
 import Contract from '../../../../src/lib/models/contract';
-import Term from '../../../../src/lib/models/contract/Term';
+import Term from '../../../../src/lib/models/term';
 import Price from '../../../../src/lib/models/price';
 
 import Transaction from '../../../../src/lib/models/transaction';

@@ -4,7 +4,7 @@ import Stateable from '../../pattern/Stateable';
 import Undoable from '../../pattern/Undoable';
 
 import Validator from './Validator';
-import Term from './Term';
+import Term from '../term';
 import Actor from '../Actor';
 
 /**
